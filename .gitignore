@@ -1,6 +1,41 @@
+# Environment
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and build
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints
+
+# Project logs, cache, temp files
+logs/
+cache/
+results/
+data/
+activate.bat
+
+# Keep certificates and documentation ignored
+ca-certificate.crt
+.env
 CLAUDE.md
 DATA_CLEANING_PROCEDURE.md
 TIMEZONE_HANDLING.md
 CHECKLIST.md
 NEWS_MANAGEMENT.md
-.env

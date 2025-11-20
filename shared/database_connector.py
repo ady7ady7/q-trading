@@ -74,17 +74,14 @@ class DatabaseConnection:
         if cls._engine is None:
             logger.info("Initializing database connection...")
 
-            # Configure SSL context if certificate exists
+            # Prepare connection arguments
             connect_args = {}
             cert_path = Path(DATABASE_CA_CERT_PATH)
 
+            # For psycopg2, CA certificate is passed via sslrootcert parameter
             if cert_path.exists():
-                ssl_context = ssl.create_default_context()
-                ssl_context.check_hostname = False
-                ssl_context.verify_mode = ssl.CERT_REQUIRED
-                ssl_context.load_verify_locations(str(cert_path))
-                connect_args['ssl_context'] = ssl_context
-                logger.info(f"SSL configured with cert: {cert_path}")
+                connect_args['sslrootcert'] = str(cert_path)
+                logger.info(f"SSL configured with CA cert: {cert_path}")
             else:
                 logger.warning(
                     f"CA certificate not found at {cert_path}. "
@@ -102,10 +99,10 @@ class DatabaseConnection:
                 # Test connection
                 with cls._engine.connect() as conn:
                     conn.execute(text("SELECT 1"))
-                logger.info("✓ Database connection successful")
+                logger.info("[OK] Database connection successful")
 
             except Exception as e:
-                logger.error(f"✗ Database connection failed: {e}")
+                logger.error(f"[ERROR] Database connection failed: {e}")
                 raise
 
         return cls._engine
@@ -201,12 +198,13 @@ def fetch_ohlcv(
                 columns=['timestamp', 'open', 'high', 'low', 'close', 'volume']
             )
 
-        # Ensure timestamp is datetime
+        # Ensure timestamp is datetime and set as index
         df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df.set_index('timestamp')
 
         logger.info(
-            f"✓ Fetched {len(df)} candles "
-            f"({df['timestamp'].min()} to {df['timestamp'].max()})"
+            f"[OK] Fetched {len(df)} candles "
+            f"({df.index.min()} to {df.index.max()})"
         )
         return df
 
@@ -273,7 +271,7 @@ def get_symbol_metadata(symbol: str) -> Dict:
             'can_update_from': row[4],
         }
 
-        logger.info(f"✓ Metadata fetched: {metadata['total_records']} records")
+        logger.info(f"[OK] Metadata fetched: {metadata['total_records']} records")
         return metadata
 
     except Exception as e:
@@ -317,7 +315,7 @@ def check_symbol_availability(symbol: str, timeframe: str) -> bool:
             logger.warning(f"Table {table_name} is empty")
             return False
 
-        logger.info(f"✓ {table_name} available ({count} rows)")
+        logger.info(f"[OK] {table_name} available ({count} rows)")
         return True
 
     except Exception as e:
@@ -389,7 +387,7 @@ def get_date_range(symbol: str, timeframe: str) -> Dict:
         }
 
         logger.info(
-            f"✓ Date range for {symbol} {timeframe}: "
+            f"[OK] Date range for {symbol} {timeframe}: "
             f"{date_range['start']} to {date_range['end']}"
         )
         return date_range

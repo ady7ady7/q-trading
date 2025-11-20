@@ -10,15 +10,25 @@ from pathlib import Path
 from dotenv import load_dotenv
 from datetime import time
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (explicitly from project root)
+# Try multiple paths to find .env (for flexibility with different working directories)
+_possible_env_paths = [
+    Path(__file__).parent.parent / '.env',  # shared/../.env
+    Path.cwd() / '.env',  # current working directory
+]
+for _env_path in _possible_env_paths:
+    if _env_path.exists():
+        load_dotenv(_env_path, override=True)
+        break
 
 # ============================================================================
 # DATABASE CONFIGURATION
 # ============================================================================
 DATABASE_URL = os.getenv('DATABASE_URL')
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL not set in .env file")
+    # Debug: show which file was checked
+    checked_paths = ' or '.join(str(p) for p in _possible_env_paths)
+    raise ValueError(f"DATABASE_URL not set in .env file. Checked: {checked_paths}")
 
 DATABASE_CA_CERT_PATH = os.getenv('DATABASE_CA_CERT_PATH')
 if not DATABASE_CA_CERT_PATH:
@@ -277,6 +287,40 @@ def is_tradfi_symbol(symbol: str) -> bool:
 def is_crypto_symbol(symbol: str) -> bool:
     """Check if symbol is cryptocurrency."""
     return symbol.lower() in CRYPTO_SYMBOLS
+
+
+# ============================================================================
+# MARKET HOLIDAYS AND TRADING CALENDARS
+# ============================================================================
+# Major holidays when markets are closed (YYYY-MM-DD format)
+# Update this list with market-specific holidays
+MARKET_HOLIDAYS = {
+    # Global holidays
+    '2024-01-01',  # New Year's Day
+    '2024-12-25',  # Christmas
+    '2024-12-26',  # Boxing Day
+    '2025-01-01',  # New Year's Day
+    '2025-12-25',  # Christmas
+    '2025-12-26',  # Boxing Day
+    # US holidays
+    '2024-07-04',  # Independence Day
+    '2024-11-28',  # Thanksgiving
+    '2024-12-24',  # Christmas Eve (half day)
+    '2025-01-20',  # MLK Jr Day
+    '2025-02-17',  # Presidents Day
+    '2025-03-17',  # St Patrick's Day (some markets)
+    '2025-04-18',  # Good Friday
+    '2025-05-26',  # Memorial Day
+    '2025-07-04',  # Independence Day
+    '2025-09-01',  # Labor Day
+    '2025-11-27',  # Thanksgiving
+    # EU holidays
+    '2024-03-29',  # Good Friday
+    '2024-04-01',  # Easter Monday
+    '2025-04-18',  # Good Friday
+    '2025-04-21',  # Easter Monday
+    '2025-05-01',  # Labour Day
+}
 
 
 def get_table_name(symbol: str, timeframe: str, exchange: str = None) -> str:

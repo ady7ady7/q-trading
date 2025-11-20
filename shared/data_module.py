@@ -30,6 +30,7 @@ from shared.config import (
     DIAGNOSTIC_TEST_MISSING_PERCENT,
     LOG_LEVEL,
     LOGS_DIR,
+    MARKET_HOLIDAYS,
     get_symbol_info,
 )
 
@@ -96,66 +97,94 @@ def process_data(
         logger.warning("Input DataFrame is empty")
         return df
 
-    # Step 1: Ensure timezone awareness (UTC)
-    df = _ensure_utc_timezone(df)
+    # Step 1: Ensure timestamp is the index (data from DB is already UTC)
+    if 'timestamp' in df.columns:
+        df = df.set_index('timestamp')
 
-    # Step 2: Validate OHLC consistency
+    # Step 2: Localize to UTC if naive (needed for proper timezone handling)
+    if df.index.tz is None:
+        df.index = df.index.tz_localize('UTC')
+
+    # Step 3: Convert to local timezone for analysis (market hours are in local time)
+    target_tz = get_symbol_info(symbol)['timezone']
+    df = _convert_to_local_time(df, target_tz)
+    logger.info(f"Converted to local timezone: {target_tz}")
+
+    # Step 4: Filter to market hours only
+    df = _filter_to_market_hours(df, symbol)
+
+    # Step 5: Validate OHLC consistency
     _validate_ohlc(df, symbol)
 
-    # Step 3: Diagnostics (gaps, outliers, missing data)
+    # Step 6: Diagnostics (gaps, outliers, missing data) - now in local time, market hours only
     _run_diagnostics(df, symbol, timeframe)
 
-    # Step 4: Data cleaning (imputation)
+    # Step 7: Data cleaning (imputation)
     df = _clean_data(df, symbol)
 
-    # Step 5: Timezone conversion (if requested)
-    if local_time:
-        target_tz = get_symbol_info(symbol)['timezone']
-        df = _convert_to_local_time(df, target_tz)
-        logger.info(f"Converted to local timezone: {target_tz}")
-
-    # Step 6: News filtering (if requested)
+    # Step 8: News filtering (if requested)
     if exclude_news:
         df = _filter_news_dates(df, symbol)
 
     logger.info(
-        f"✓ Data processing complete: {len(df)} candles, "
+        f"[OK] Data processing complete: {len(df)} candles, "
         f"range {df.index.min()} to {df.index.max()}"
     )
     return df
 
 
 # ============================================================================
-# TIMEZONE HANDLING
+# MARKET HOURS FILTERING
 # ============================================================================
-def _ensure_utc_timezone(df: pd.DataFrame) -> pd.DataFrame:
+def _filter_to_market_hours(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
     """
-    Ensure DataFrame has UTC timezone-aware datetime index.
+    Filter DataFrame to only include candles within market trading hours.
 
-    Args:
-        df (pd.DataFrame): DataFrame with 'timestamp' column
+    ASSUMES: DataFrame is already in LOCAL timezone for the instrument.
+
+    Removes:
+      - Weekend candles
+      - Holiday candles
+      - Candles outside market hours (e.g., before 09:00 or after 17:30 for DAX)
 
     Returns:
-        pd.DataFrame: DataFrame with UTC timezone-aware index
+        Filtered DataFrame with only market-hours candles.
     """
-    if 'timestamp' not in df.columns:
-        raise ValueError("DataFrame must have 'timestamp' column")
+    try:
+        symbol_info = get_symbol_info(symbol)
+        market_open = symbol_info['market_open']
+        market_close = symbol_info['market_close']
+    except:
+        # If symbol not found, return data as-is (24/7 markets like crypto)
+        logger.info("Market hours not found for symbol, keeping all data")
+        return df
 
-    # Convert to datetime if not already
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    # Filter by weekday (0=Mon, 4=Fri, 5=Sat, 6=Sun)
+    df_filtered = df[df.index.weekday < 5].copy()
 
-    # If naive, localize to UTC
-    if df['timestamp'].dt.tz is None:
-        df['timestamp'] = df['timestamp'].dt.tz_localize('UTC')
-    # If timezone-aware but not UTC, convert to UTC
-    elif df['timestamp'].dt.tz != pytz.UTC:
-        df['timestamp'] = df['timestamp'].dt.tz_convert('UTC')
+    # Filter by holiday
+    df_filtered = df_filtered[
+        ~df_filtered.index.strftime('%Y-%m-%d').isin(MARKET_HOLIDAYS)
+    ].copy()
 
-    df = df.set_index('timestamp')
-    logger.debug("Timezone set to UTC")
-    return df
+    # Filter by market hours
+    df_filtered = df_filtered[
+        (df_filtered.index.time >= market_open) &
+        (df_filtered.index.time <= market_close)
+    ].copy()
+
+    n_removed = len(df) - len(df_filtered)
+    logger.info(
+        f"[OK] Filtered to market hours: removed {n_removed} candles "
+        f"({len(df_filtered)} remaining)"
+    )
+
+    return df_filtered
 
 
+# ============================================================================
+# TIMEZONE HANDLING
+# ============================================================================
 def _convert_to_local_time(df: pd.DataFrame, target_tz: str) -> pd.DataFrame:
     """
     Convert DataFrame index from UTC to target timezone.
@@ -238,7 +267,7 @@ def _validate_ohlc(df: pd.DataFrame, symbol: str) -> None:
             n_invalid = (df[col] <= 0).sum()
             logger.warning(f"{n_invalid} candles with {col} <= 0")
 
-    logger.info("✓ OHLC validation complete")
+    logger.info("[OK] OHLC validation complete")
 
 
 # ============================================================================
@@ -253,7 +282,7 @@ def _run_diagnostics(
     Run comprehensive diagnostics on the data.
 
     Performs:
-      - Gap analysis (missing candles)
+      - Gap analysis (missing candles, accounting for market hours/holidays)
       - Missing data analysis
       - Outlier detection
 
@@ -264,43 +293,66 @@ def _run_diagnostics(
     """
     logger.info(f"Running diagnostics for {symbol} {timeframe}...")
 
-    _analyze_gaps(df, timeframe)
+    _analyze_gaps(df, timeframe, symbol)
     _analyze_missing_data(df)
     _detect_outliers(df)
 
-    logger.info("✓ Diagnostics complete")
+    logger.info("[OK] Diagnostics complete")
 
 
-def _analyze_gaps(df: pd.DataFrame, timeframe: str) -> None:
-    """Analyze missing candles in time series."""
+def _analyze_gaps(df: pd.DataFrame, timeframe: str, symbol: str = None) -> None:
+    """
+    Analyze missing candles in already-filtered data.
+
+    ASSUMES: Data is already in LOCAL timezone and filtered to market hours.
+
+    Simple analysis: Check for gaps between consecutive candles.
+    No need to regenerate expected timestamps (avoids DST issues).
+
+    Args:
+        df (pd.DataFrame): Already filtered OHLCV data (market hours only)
+        timeframe (str): Timeframe (m1, m5, h1, etc.)
+        symbol (str): Symbol name (optional)
+    """
     if len(df) < 2:
         logger.warning("Not enough data to analyze gaps")
         return
 
-    # Expected frequency
     freq_map = {
-        'm1': '1min',
-        'm5': '5min',
-        'm15': '15min',
-        'h1': '1h',
-        'd1': '1D',
+        'm1': 1,
+        'm5': 5,
+        'm15': 15,
+        'h1': 60,
+        'd1': 1440,
     }
-    expected_freq = freq_map.get(timeframe.lower())
-    if not expected_freq:
+
+    expected_minutes = freq_map.get(timeframe.lower())
+    if expected_minutes is None:
         logger.warning(f"Unknown timeframe {timeframe}, skipping gap analysis")
         return
 
-    # Find gaps
-    time_diffs = df.index.to_series().diff()
-    expected_delta = pd.to_timedelta(expected_freq)
+    # Calculate expected duration based on first and last timestamp
+    total_duration = (df.index[-1] - df.index[0]).total_seconds() / 60  # in minutes
+    expected_candles_theoretical = (total_duration / expected_minutes) + 1
 
-    gaps = time_diffs[time_diffs > expected_delta]
-    if len(gaps) > 0:
-        logger.warning(
-            f"Detected {len(gaps)} gaps. Largest: {gaps.max()}"
-        )
-    else:
-        logger.info("✓ No significant gaps detected")
+    # Actual candles we have
+    actual_candles = len(df)
+
+    # Simple gap: difference between theoretical and actual
+    missing_candles = expected_candles_theoretical - actual_candles
+    gap_pct = (missing_candles / expected_candles_theoretical * 100) if expected_candles_theoretical > 0 else 0
+
+    logger.info(f"Gap Analysis ({symbol or 'data'} {timeframe}):")
+    logger.info(f"  Date range (local): {df.index.min()} to {df.index.max()}")
+    logger.info(f"  Theoretical candles (continuous): {expected_candles_theoretical:.0f}")
+    logger.info(f"  Actual candles: {actual_candles}")
+    logger.info(f"  Missing: {missing_candles:.0f} ({gap_pct:.1f}%)")
+    logger.info(f"  Note: Data already filtered to market hours (weekdays, trading hours, non-holidays)")
+
+    if gap_pct > 5:
+        logger.warning(f"  [WARNING] Gap rate {gap_pct:.1f}% exceeds 5% threshold")
+    elif gap_pct == 0:
+        logger.info("[OK] No missing candles")
 
 
 def _analyze_missing_data(df: pd.DataFrame) -> None:
@@ -319,10 +371,10 @@ def _analyze_missing_data(df: pd.DataFrame) -> None:
 
                 if pct > GAP_TOLERANCE_PERCENT:
                     logger.warning(
-                        f"  ⚠ {col} exceeds {GAP_TOLERANCE_PERCENT}% threshold"
+                        f"  [WARNING] {col} exceeds {GAP_TOLERANCE_PERCENT}% threshold"
                     )
     else:
-        logger.info("✓ No missing data")
+        logger.info("[OK] No missing data")
 
 
 def _detect_outliers(df: pd.DataFrame) -> None:
@@ -360,7 +412,7 @@ def _detect_outliers(df: pd.DataFrame) -> None:
             outliers_found = True
 
     if not outliers_found:
-        logger.info("✓ No outliers detected")
+        logger.info("[OK] No outliers detected")
 
 
 # ============================================================================
@@ -441,7 +493,7 @@ def _clean_data(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
         if col not in existing_cols:
             df_imputed[col] = df[col]
 
-    logger.info("✓ Data cleaning complete")
+    logger.info("[OK] Data cleaning complete")
     return df_imputed
 
 
