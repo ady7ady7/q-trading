@@ -8,3 +8,8 @@ missingno
 scikit-learn
 fancyimpute
 pytest
+matplotlib
+seaborn
+statsmodels
+jupyter
+ipykernel

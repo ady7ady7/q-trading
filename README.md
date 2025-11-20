@@ -6,20 +6,35 @@ A production-ready Python framework for quantitative trading research and backte
 
 ## **Quick Start**
 
-### **1. Setup**
+### **1. Setup Virtual Environment**
 
 ```bash
+# Create virtual environment (first time only)
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate.bat
+# On Linux/Mac:
+source venv/bin/activate
+
 # Install dependencies
 pip install -r requirements.txt
-
-# Configure environment
-# Create .env file with your PostgreSQL credentials:
-# DATABASE_URL=postgresql://user:password@host:port/db
-# DATABASE_CA_CERT_PATH=./certs/ca-certificate.crt
-# LOG_LEVEL=INFO
 ```
 
-### **2. Fetch and Process Data**
+### **2. Configure Environment**
+
+```bash
+# Create .env file with your PostgreSQL credentials:
+# DATABASE_URL=postgresql://user:password@host:port/db?sslmode=require
+# DATABASE_CA_CERT_PATH=./certs/ca-certificate.crt
+# LOG_LEVEL=INFO
+
+# Test connection
+python test_connection.py
+```
+
+### **3. Fetch and Process Data**
 
 ```python
 from shared.database_connector import fetch_ohlcv, check_symbol_availability
