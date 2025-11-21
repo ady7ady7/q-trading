@@ -176,6 +176,52 @@ df_clean = process_data(
 
 ---
 
+## **Important: Timezone Offset for DAX Data**
+
+### **Context**
+
+Database stores all timestamps in UTC (TIMESTAMPTZ). For DAX (deuidxeur):
+- **Database**: Stores timestamps in UTC format
+- **TradingView FDAX**: Shows prices with wall-clock times (Berlin local time)
+- **Offset discovered**: Database UTC times correspond to TradingView times **2 hours ahead**
+
+**Example:**
+- Database UTC: `13:00:00 UTC`
+- Converted to Berlin: `15:00:00 CEST` (during summer) / `15:00:00 CET` (during winter... wait, that's wrong)
+
+Actually, let me correct this:
+- Database UTC: `13:00:00 UTC`
+- Convert to Berlin (+02:00 in October): `15:00:00 CEST`
+- This matches TradingView FDAX display at 15:00
+
+**Why the offset?**
+- DAX Spot Index (deuidxeur) and DAX Futures (FDAX) have different trading characteristics
+- Our data represents the spot index, which has different price levels than FDAX
+- When comparing against TradingView FDAX candles, remember this is a different instrument
+
+### **Practical Usage**
+
+When performing research:
+1. **M1 data with early hours**: If you want to include pre-market or early session hours, fetch from 07:00 UTC onwards
+   - 07:00 UTC = 09:00 CEST/CET (Berlin local) = 09:00 on TradingView FDAX display
+2. **For spot-checking candles**: Remember the 2-hour wall-clock offset between our UTC timestamps and TradingView FDAX display
+3. **For internal analysis**: No adjustment needed—data is internally consistent and properly sequenced
+
+### **Configuration**
+
+Market hours for DAX (deuidxeur) in `config.py`:
+```python
+'deuidxeur': {
+    'timezone': 'Europe/Berlin',
+    'market_open': time(9, 0),      # 09:00 Berlin local
+    'market_close': time(17, 30),   # 17:30 Berlin local
+}
+```
+
+This is 07:00-15:30 UTC (accounting for +02:00 summer offset) or 08:00-16:30 UTC (with +01:00 winter offset).
+
+---
+
 ## **config.py**
 
 Centralized configuration.

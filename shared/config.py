@@ -52,8 +52,8 @@ SYMBOLS = {
         'name': 'DAX Index',
         'asset_type': 'tradfi',
         'timezone': 'Europe/Berlin',
-        'market_open': time(9, 0),
-        'market_close': time(17, 30),
+        'market_open': time(7, 0), #9:00 Local time
+        'market_close': time(15, 30), #17:00 local time
     },
     'usa500idxusd': {
         'name': 'S&P 500',
