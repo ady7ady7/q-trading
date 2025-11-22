@@ -19,6 +19,29 @@ This analysis investigates whether **local highs and lows** formed between 10:00
 
 ---
 
+## ⚠️ CRITICAL: Timezone/DST Validation Required
+
+**Before trusting ANY results from this analysis, you MUST validate that timezone offsets are correct.**
+
+The analysis spans 300 days which includes multiple DST transitions (Spring and Fall). If timezone conversion is broken:
+- All summer data could be off by 1 hour
+- Local high/low patterns could be false positives due to time shift
+- The "10:00-13:00 window" might actually be 09:00-12:00 or 11:00-14:00
+
+**Quick Validation (2 checks only):**
+
+1. **Check current regime:** Extract 1 candle from THIS WEEK, cross-check on TradingView
+2. **Check previous regime:** Extract 1 candle from BEFORE last DST change, cross-check on TradingView
+3. If both match → timezone handling is correct ✓
+
+See: [DST_VALIDATION_PROTOCOL.md](DST_VALIDATION_PROTOCOL.md) for detailed instructions.
+
+**Validation Status:** [NOT YET VALIDATED]
+**When Validated:** [TBD]
+**Validated By:** [TBD]
+
+---
+
 ## Data Quality & Methodology
 
 ### Sample Size
