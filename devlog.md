@@ -5,3 +5,7 @@
 
 22.11, Day 2
 - I added some docs + DST manual validation instructions - THIS IS AN ABSOLUTELY CRITICAL THING TO DO and I want to check it at least for a first few research projects, whether the offset is correct and we're making right observations (as DST offset between winter/summer time shift could POTENTIALLY also change how we should offset our data from the database).
+
+24.11, Day 3
+- I ran another research on volatility correlation between the early range (tested multiple options) and the range of the rest of the day (11-17:30). Some key observations: Ther is a 53% predictive accuracy for predicting rest-of-the-day range after waiting for the first 2 hours (9-11). Pearson r = 0.728; p < 0.001 and generally large volatility morning signifies large volatility for the rest of the day; quiet morning -> quiet rest-of-day; 
+THIS IS NOT A STRONG EDGE, but rather an observation of medium predictive power of session momentum, but it is there, and we can explore DAX further to find more similar observations that could support a bias and perhaps build a stable edge.
