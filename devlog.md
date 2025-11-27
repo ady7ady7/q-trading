@@ -12,3 +12,7 @@ THIS IS NOT A STRONG EDGE, but rather an observation of medium predictive power 
 
 25.11, Day 4
 - This time I've used my own trading experience, the brilliance of the smartest math LLM (Gemini according to the LLM leaderboard as of today) to properly plan out the research and then obviously used the smartest coding LLM which resulted in quite fruitful reveal of a potential edge with over 70% prediction accuracy - this is still to be verified, but it seems that I have my first actionable and scientifically proven edge that I will definitely try out or maybe back up with more scientific observations. NICE!
+
+27.11.25 Day 5
+- After following up with Volatility Regimes + Direction -> Mean Rev vs Continuation reseearch - it seems that the best pattern to work with (that I can actually calculate beforehand) is actually a quiet (Q1) volatility regime + strong up movement during the first hour (9:00 - 10:00) - it gives a 65% for continuation up. The other regimes don't give such an edge, so I can assume that Q4 is choppy and can go both ways (est. 50-60% for continuation, unstable)
+- I already planned a follow up research of day-to-day continuation patterns depending on regimes and maybe some other factors

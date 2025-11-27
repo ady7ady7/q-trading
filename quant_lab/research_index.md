@@ -7,7 +7,49 @@ Central index of all research notebooks and analysis in the quant_lab directory.
 
 ## Active Research
 
-### 1. CHAR_DE40_Volatility_Regime_Analysis.ipynb
+### 1. CHAR_DE40_Direction_Magnitude_MomentumReversion.ipynb
+**Status:** ACTIVE (Created 2025-11-25)
+
+**Objective:** Determine if first-hour move (direction + magnitude, normalized by volatility) predicts rest-of-day behavior (continuation vs reversal), and how this depends on volatility regime.
+
+**Data:**
+- M5 (5-minute) OHLCV bars
+- Date range: Jan 2023 - Sept 2025
+- Timezone: UTC → Europe/Berlin (pytz auto DST)
+
+**Key Features:**
+- First-hour returns (R_open_10: 09:00-10:00)
+- Rest-of-day returns (R_10_close: 10:00-17:30)
+- Normalized by 20-day rolling average of absolute moves
+- Binned by move magnitude: Strong Up/Mild Up/Mild Down/Strong Down
+- Analyzed separately by volatility regime (Low/Normal/High)
+- And by early session strength quartile (Q1 Quiet vs Q4 Spicy)
+
+**Output Metrics:**
+- Continuation frequency (% of days where rest-of-day continues the opening move)
+- Reversal frequency (% of days where rest-of-day reverses the opening move)
+- Mean rest-of-day return by move type and regime
+- Statistical significance (t-tests, binomial tests)
+
+**Pattern Types Identified:**
+- **MOMENTUM:** Continuation frequency > 60% (opening move continues)
+- **MEAN-REVERSION:** Reversal frequency > 60% (opening move fades)
+- **MIXED:** No clear pattern (near 50% continuation)
+
+**Trading Application:**
+- High Vol + Spicy: Play continuation of opening moves (ORB strategy)
+- Low Vol + Quiet: Play reversal of opening extremes (ORR strategy)
+- Normal Vol: Mixed patterns, use additional confirmations
+
+**Next Steps:**
+- Run notebook and identify regime-dependent patterns
+- Test for autocorrelation effects (yesterday's regime carry-over)
+- Backtest identified rules on out-of-sample data
+- Combine with entry/exit signals for full strategy
+
+---
+
+### 2. CHAR_DE40_Volatility_Regime_Analysis.ipynb
 **Status:** ACTIVE (Created 2025-11-25)
 
 **Objective:** Determine if first-hour volatility (09:00-10:00 Berlin time) on DAX can predict the full-day volatility regime.
