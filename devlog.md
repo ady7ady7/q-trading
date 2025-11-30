@@ -30,4 +30,5 @@ I decided to extend my current research to also take the direction into account 
 + moved today's notebooks to a new folder archive/ as they don't seem to have a lot of use - might delete them later
 
 
-
+30.11.25 (Day 7)
+- Replicated my previous research (Volatility Regimes + FHM) using slightly different FHM calculation approach (more H-L oriented than O-C) - the findings are promising imo and COULD POTENTIALLY BUILD A VALID STRATEGY WITH CERTAIN ADJUSTMENTS
