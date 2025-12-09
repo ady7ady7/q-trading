@@ -78,14 +78,14 @@ print(df_clean.index.tz)  # Europe/London
 │   ├── config.py                  # Configuration, symbols, timezones
 │   ├── database_connector.py      # PostgreSQL operations
 │   ├── data_module.py             # Data processing (validate, clean, impute)
-│   ├── engine.py                  # Backtester (Sprint 3)
-│   └── reporting.py               # Metrics & reporting (Sprint 3)
+│   ├── engine.py                  # Backtester (TBD)
+│   └── reporting.py               # Metrics & reporting (TBD)
 ├── quant_lab/
 │   └── notebooks/                 # Research Jupyter notebooks
 │       ├── CHAR_DE40_Trend_And_Range.ipynb
 │       ├── PHENOM_EURUSD_IB_Stats.ipynb
 │       └── ANALYSIS_LINEAR_REGRESSION.ipynb
-├── vector_bt/
+├── vector_bt/ - TBD
 │   ├── strategies/                # Strategy implementations
 │   ├── main.py                    # Strategy runner
 │   └── sweep.py                   # Parameter optimization
@@ -223,7 +223,7 @@ CREATE TABLE symbol_metadata (
 - News calendar filtering
 - Comprehensive logging
 
-### **Sprint 2: Research** (Next)
+### **Sprint 2: Research** (WE ARE HERE AND NOT MOVING FURTHER YET - I'M IN THE RESEARCH LOOP RN)
 - quant-lab environment setup
 - DE40 characteristics analysis
 - EURUSD Initial Balance breakout study
