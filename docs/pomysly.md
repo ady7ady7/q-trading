@@ -14,3 +14,4 @@ Obecnie:
 Co chcemy jeszcze sprawdzić:
 - BYĆ MOŻE SENS MA LICZENIE PIVOTÓW DLA SAMEJ 9-10 I PRACA Z TYM (local pivoty?)
 - Interakcje ceny w oparciu o PP → gdy cena otwiera się nad PP, jak wygląda dystrybucja open/low/high/close dnia - czy możemy się spodziewać, że close będzie nad pp z większym prawdopodobieństwem? czy możemy się spodziewać, że close będzie nad open? czy wpływa to na dystrybucje formowania low/high? czy często jest testowane/przebijane?
+

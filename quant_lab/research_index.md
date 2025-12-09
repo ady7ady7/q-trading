@@ -64,6 +64,25 @@ Tested which early window (5min, 30min, 1hr, 2hr, premarket) predicts rest-of-da
 - Pattern: Large morning → large rest-of-day (momentum, not reversal)
 - Effect size: 77% more rest-of-day volatility if opening in top 25%
 
+### 9. CHAR_DE40_HL_Based_First_Hour_Move.ipynb
+**Finding:** PENDING (Alternative classification method)
+Tested if high/low-based first-hour move (vs open/close) improves edge detection.
+**Method:** First-hour classified by range structure (StrongUpHL, StrongDownHL, Balanced, Quiet) instead of open-close return.
+**Hypothesis:** HL structure might capture volatility + direction better than simple O/C return.
+**Two periods tested:** 2020-2025 (full) and 2023-2025 (recent)
+**Expected:** If no improvement over existing 65% edge, confirms original method is sufficient.
+
+### 10. CHAR_DE40_Pivot_Point_Predictive_Power.ipynb
+**Finding:** PENDING (Standard pivot levels)
+Tested if opening position (09:00) relative to standard pivot point predicts R/S level hits and closing outcome.
+**Method:**
+- Calculate pivot point from previous day H/L/C
+- Test: Open > PP → R1/R2/R3 hit probability
+- Test: Open < PP → S1/S2/S3 hit probability
+- Test: 10:00 confirmation adds value vs 09:00 only
+**Hypothesis:** If Open > PP, expect higher probability of hitting R1 (> 60%).
+**Edge threshold:** Strong = 60%+, Weak = 55-60%, None = <55% (≈random)
+
 ---
 
 ## What Didn't Work (Dead Ends)
@@ -144,8 +163,10 @@ Tested which early window (5min, 30min, 1hr, 2hr, premarket) predicts rest-of-da
 | 6 | First hour→rest-of-day (intraday)? | YES 65% (quiet+strong up) | **KEEP THIS** |
 | 7 | Early vol→daily regime? | Moderate (R²=0.53) | Confirmed |
 | 8 | Early range→rest-of-day range? | YES (R²=0.53, 77% effect) | Confirmed |
+| 9 | HL-based first hour (alternative)? | StrongUpHL -> 81% continuation (N = 212, 0.8/week) | Confirmed, Skeptical - I guess it depends on execution, this is not yet written down in Key findings, still TBC
+| 10 | Pivot points predict R/S hits? | OPEN > PP -> R1 (79%) -> R2 (49%); similar rates in relation to S1/S2 below PP | Confirmed - KEEP + TEST FURTHER, not yet written down in key findings, to be tested!
 
-**Bottom line:** Focus on intraday patterns (first hour, quiet regime). Ignore day-to-day direction betting.
+**Bottom line:** Focus on intraday patterns (first hour, quiet regime). Ignore day-to-day direction betting. Test pivot levels and HL-based classification to confirm or improve existing edge.
 
 ---
 

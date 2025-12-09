@@ -32,3 +32,7 @@ I decided to extend my current research to also take the direction into account 
 
 30.11.25 (Day 7)
 - Replicated my previous research (Volatility Regimes + FHM) using slightly different FHM calculation approach (more H-L oriented than O-C) - the findings are promising imo and COULD POTENTIALLY BUILD A VALID STRATEGY WITH CERTAIN ADJUSTMENTS
+
+9.12.25 (Day 8)
+- Today's research focuses on quantifying the probabilistic advantage of DAX 9:00 and 10:00 prices in relation to the daily PP in predicting the daily close and the touch probability of R/S levels - CHAR_DE_40_Pivot_Point_Predictive_Power.ipynb. The H0 was rejected, and it seems to have a PRETTY HIGH EDGE, and I will want to backtest it further!
+That's one of the two researches I'm planning to do in relation to DAX, and sooner or later I will also move to check NASDAQ. The second research will focus on Pullbacks.
