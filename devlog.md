@@ -36,8 +36,15 @@ I decided to extend my current research to also take the direction into account 
 9.12.25 (Day 8)
 - Today's research focuses on quantifying the probabilistic advantage of DAX 9:00 and 10:00 prices in relation to the daily PP in predicting the daily close and the touch probability of R/S levels - CHAR_DE_40_Pivot_Point_Predictive_Power.ipynb. The H0 was rejected, and it seems to have a PRETTY HIGH EDGE, and I will want to backtest it further! We could also do a similar research and calculate PP on the basis of 8:00-9:00 and 9:00-10:00 and set different time windows.
 I could try to set up a backtest for a very simple strat (TP -> R1, SL -> S1 - while checking that R:R is at least 2:1 [We risk twice as much as we gain])
-That's one of the two researches I'm planning to do in relation to DAX, and sooner or later I will also move to check NASDAQ. The second research will focus on Pullbacks.
+
+That's one of the two stdies I'm planning to do on DAX, and sooner or later I will also move to check NASDAQ. The second research will focus on Pullbacks.
 
 10.12.25 (Day 9)
-- Today I'm recreating yesterday's research WITH MUCH MORE DETAILED AND GRANULAR APPROACH - we're looking at different scenarios of openings (not only above/below PP, but also above R1, R2, S1 etc.) AND we're also looking at more granular targets (0.25, 0.5, 0.75 between the pivot points) to get more detailed data.
-- The research again seems to be very promising and I've found POTENTIAL scenarios that could serve as great examples for a mechanical strategy - almost all of them seem to make sense, but I will have to test it out more.
+- Today I'm recreating yesterday's research WITH MUCH MORE DETAILED AND GRANULAR APPROACH - we're looking at open distributions - different scenarios of openings (not only above/below PP, but also above R1, R2, S1 etc.) AND we're also looking at more granular targets (0.25, 0.5, 0.75 between the pivot points) to get more detailed data.
+- The research seems to be very promising and I've found POTENTIAL scenarios that could serve as great examples for a mechanical strategy - almost all of them seem to make sense, but I will have to test it out more. IT ALSO COMES WITH DANGERS, AS IT CAN EASILY BE MISINTERPRETED! (ecological fallacy - applying general statistics to a specific scenario; conditional probabilility fallacy/inverse fallacy - assuming the probabilities of P -> R1 are the same as P -> R1 | -> S1 OR P -> S1 | -> R1 etc.). This is very dangerous, as this study ONLY LOOKS AT P -> X scenarios, and reaching an opposite target point AFTER GOING OUT TO AN R1/S1 may be highly unlikely (to be tested).
+
+11.12.25 (Day 10)
+- I decided to also make a conditional probability study, similar to the yesterday's research, but this time checking chances of reaching respective targets AFTER flagging any target on a given day (e.g. PP_R1 open -> R1 | -> ?)
+- I can also then do a similar study & add volatility regimes/fhm strength
+
+- When attempting to do the research, I've discovered a critical issue with false positive - a temporal bias - where we would count reaching target ALSO BEFORE actually checking the condition (e.g. counting S1_S2_050 on S1_S2 opening day after reaching S1, but also taking into account those cases where S1_S2_050 was reached before reaching S1 - which is nonsensical) - Only count target as "reached after condition" if: time_target > time_condition. To do that, we might have to run inefficient nested loops, but THIS IS ABSOLUTELY NECESSARY IN STUDIES LIKE THIS AND I WILL HAVE TO TAKE TEMPORAL BIAS into account in every similar study! - Improved version CHAR_DE40_Pivot_Points_Conditional_Probabilities2

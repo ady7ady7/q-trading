@@ -8,11 +8,9 @@ rezimu premarket 8-9, kierunku premarket 8-9; nawet nie na cały dzień ale jedy
 
 - 30.11
 Obecnie:
-- sprawdzić, jak wyglądają też cofki procentowe do pułapu range (open-close lub low-high; najlepiej oba warianty) i ewentualne powroty do open-close czy high/low
+- zrobiony research pivotów + scenariusze conditional
 
 
 Co chcemy jeszcze sprawdzić:
 - BYĆ MOŻE SENS MA LICZENIE PIVOTÓW DLA SAMEJ 9-10 I PRACA Z TYM (local pivoty?)
-- Interakcje ceny w oparciu o PP → gdy cena otwiera się nad PP, jak wygląda dystrybucja open/low/high/close dnia - czy możemy się spodziewać, że close będzie nad pp z większym prawdopodobieństwem? czy możemy się spodziewać, że close będzie nad open? czy wpływa to na dystrybucje formowania low/high? czy często jest testowane/przebijane?
-
-+ Zrobic check uderzania rangeów typu 50% S1, 25% S1, 75% S1 itd.
+- Analogicznie szanse w korelacji z reżimami/FHM, ale generalnie imo to core już jakiś jest chociażby na jedną pełną strategię mechaniczną
