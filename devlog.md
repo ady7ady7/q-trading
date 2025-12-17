@@ -48,3 +48,14 @@ That's one of the two stdies I'm planning to do on DAX, and sooner or later I wi
 - I can also then do a similar study & add volatility regimes/fhm strength
 
 - When attempting to do the research, I've discovered a critical issue with false positive - a temporal bias - where we would count reaching target ALSO BEFORE actually checking the condition (e.g. counting S1_S2_050 on S1_S2 opening day after reaching S1, but also taking into account those cases where S1_S2_050 was reached before reaching S1 - which is nonsensical) - Only count target as "reached after condition" if: time_target > time_condition. To do that, we might have to run inefficient nested loops, but THIS IS ABSOLUTELY NECESSARY IN STUDIES LIKE THIS AND I WILL HAVE TO TAKE TEMPORAL BIAS into account in every similar study! - Improved version CHAR_DE40_Pivot_Points_Conditional_Probabilities2
+
+12-13.12 (Days 11-12)
+- Attempted to do a similar research on local pivots, with very similar calculation logic as stanard pivots but using local prices
+
+16.12 (Day 13)
+- I discovered some bugs in calculations - price should reach all the levels between the condition -> target, but for some reason the numbers don't add up - I will have to look into it thoroughly tomorrow
+
+17.12 (Day 14)
+- The issue I specified above seems to be fixed now - it seems that it originated from price levels being reached at the same m5 candle (it only counted the highest level then, which skewed the results)
+- HOWEVER, BE AWARE that the current approach ALSO COUNTS SCENARIOS when condition + target happen in same candle (and we don't know which happened first!!!)
+- Beside that, next step I have to follow are backtests, as there definitely are some promising scenarios to look at - I will do my backtests outisde this repository for now;;

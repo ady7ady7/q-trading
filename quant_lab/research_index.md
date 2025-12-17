@@ -83,6 +83,45 @@ Tested if opening position (09:00) relative to standard pivot point predicts R/S
 **Hypothesis:** If Open > PP, expect higher probability of hitting R1 (> 60%).
 **Edge threshold:** Strong = 60%+, Weak = 55-60%, None = <55% (≈random)
 
+### 11. CHAR_DE40_Pivot_Points_Detailed_Excursion_Study3.ipynb
+**Finding:** Findings in devlog -> subject to conditional research (12.)
+Measures probability of reaching fractional targets between pivot levels, conditioned on opening zone.
+**Method:**
+- ALL targets measured LOW→HIGH as absolute price levels (e.g., S2, S1_S2_050, S1, S1_PP_025, PP)
+- 8 opening zones: Above_R3, R2_R3, R1_R2, PP_R1, S1_PP, S2_S1, S3_S2, Below_S3
+- Fractional targets: 0.25, 0.50, 0.75 of each range
+- Simple reach: Did day's [Low, High] include this level?
+**Hypothesis:** Certain opening zones have asymmetric probabilities (e.g., PP_R1 zone → 80% reach PP_R1_050 but only 30% reach PP_R1_075).
+**Use:** Identify highest-probability fractional targets for profit-taking and stop placement.
+
+### 12. CHAR_DE40_Pivot_Points_Conditional_Probabilities2.ipynb
+**Finding:** There are very promising scenarios with positive delta and I will definitely backtest them - findings in devlog/private notes.
+Measures "Given we reached level X, what's the probability of reaching level Y AFTER that during the same session?" for STANDARD pivots (previous day H/L/C).
+**Method:**
+- Track FIRST timestamp when each level is touched (using M5 intrabar data)
+- Calculate P(Target | Condition, Zone) = Count(Target reached AFTER Condition) / Count(Condition reached)
+- Temporal ordering enforced: Only count if timestamp_target > timestamp_condition
+- Extended targets: All fractional levels (025, 050, 075) across all ranges
+**Example:** Zone S1_PP, Condition "reached S1" → What's probability of reaching S2 AFTER S1? PP AFTER S1?
+**Critical Fix:** Eliminates false positives from reverse ordering (where target was reached BEFORE condition).
+**Hypothesis:** After hitting certain levels, probabilities change dramatically (e.g., after S1 hit, 85% chance of PP but only 40% of S2 = mean reversion edge).
+**Use:** Build decision trees for intraday trading ("if zone X and level Y hit, then target Z with W% probability").
+
+### 13. CHAR_DE40_Local_Pivot_Conditional_Probabilities2.ipynb
+**Finding:** PROMISING - to be backtested (potentially superior to standard pivots for intraday)
+Measures conditional probabilities using LOCAL pivots calculated from FIRST HOUR (9:00-10:00) instead of previous day.
+**Method:**
+- Calculate local pivots from first hour H/L/C using standard formulas: LPP = (H+L+C)/3, LR1 = (2×LPP)-L, etc.
+- Classify opening zone at 10:00 (where price is relative to local pivots)
+- Track conditional probabilities for 10:00-17:30 session
+- **CRITICAL FIX:** To reach target, ALL intermediate levels must be crossed - sometimes more than one level was crossed ON A SINGLE m5 candle, and it only counted the FARTHEST level; We've fixed that with using >= for candle timestamps
+**Hypothesis:** First hour establishes intraday support/resistance more relevant than overnight levels. Local pivots may provide stronger conditional edges for same-day trading.
+**Advantage over standard pivots:** Reflects current day's intraday dynamics rather than previous day context.
+**Use:** If backtesting confirms superiority, use first hour (9:00-10:00) to establish local levels, then trade 10:00-17:30 based on local pivot conditional probabilities.
+**Status:** Potentially promising, requires backtesting vs standard pivot approach to determine which is superior.
+
+
+
 ---
 
 ## What Didn't Work (Dead Ends)
@@ -165,6 +204,9 @@ Tested if opening position (09:00) relative to standard pivot point predicts R/S
 | 8 | Early range→rest-of-day range? | YES (R²=0.53, 77% effect) | Confirmed |
 | 9 | HL-based first hour (alternative)? | StrongUpHL -> 81% continuation (N = 212, 0.8/week) | Confirmed, Skeptical - I guess it depends on execution, this is not yet written down in Key findings, still TBC
 | 10 | Pivot points predict R/S hits? | OPEN > PP -> R1 (79%) -> R2 (49%); similar rates in relation to S1/S2 below PP | Confirmed - KEEP + TEST FURTHER, not yet written down in key findings, to be tested!
+| 11 | Fractional pivot targets by zone? | See research 12 (conditional) | Pending - superseded
+| 12 | Conditional probabilities after level hit (standard)? | Promising scenarios found | To backtest
+| 13 | Conditional probabilities - LOCAL pivots (first hour)? | Promising - potentially superior to standard | To backtest vs standard
 
 **Bottom line:** Focus on intraday patterns (first hour, quiet regime). Ignore day-to-day direction betting. Test pivot levels and HL-based classification to confirm or improve existing edge.
 
@@ -181,5 +223,5 @@ Docs:
 
 ---
 
-**Last Updated:** 2025-11-29
-**Version:** 2.0 (simplified, actual findings only)
+**Last Updated:** 2024-12-14
+**Version:** 2.1 (added pivot point excursion and conditional probability studies)
