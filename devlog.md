@@ -59,3 +59,6 @@ That's one of the two stdies I'm planning to do on DAX, and sooner or later I wi
 - The issue I specified above seems to be fixed now - it seems that it originated from price levels being reached at the same m5 candle (it only counted the highest level then, which skewed the results)
 - HOWEVER, BE AWARE that the current approach ALSO COUNTS SCENARIOS when condition + target happen in same candle (and we don't know which happened first!!!)
 - Beside that, next step I have to follow are backtests, as there definitely are some promising scenarios to look at - I will do my backtests outisde this repository for now;;
+
+18.12 (Day 15)
+- Extended local pivots research with Volatility regimes and as I silently expected there seem to be some positive delta scenarios - to be tested, but he results are possibly promising to build more specific scenarios

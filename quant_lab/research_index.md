@@ -1,7 +1,7 @@
 # DAX Research Index
 
 **Period:** Jan 2023 - Sept 2025 (M5 data, 09:00-17:30 Berlin time)
-**Status:** 8 research notebooks, key edges identified, many dead ends ruled out
+**Status:** 14 research notebooks, key edges identified, many dead ends ruled out
 
 ---
 
@@ -107,7 +107,7 @@ Measures "Given we reached level X, what's the probability of reaching level Y A
 **Hypothesis:** After hitting certain levels, probabilities change dramatically (e.g., after S1 hit, 85% chance of PP but only 40% of S2 = mean reversion edge).
 **Use:** Build decision trees for intraday trading ("if zone X and level Y hit, then target Z with W% probability").
 
-### 13. CHAR_DE40_Local_Pivot_Conditional_Probabilities2.ipynb
+### 13. CHAR_DE40_Local_Pivot_Conditional_Probabilities.ipynb
 **Finding:** PROMISING - to be backtested (potentially superior to standard pivots for intraday)
 Measures conditional probabilities using LOCAL pivots calculated from FIRST HOUR (9:00-10:00) instead of previous day.
 **Method:**
@@ -119,6 +119,21 @@ Measures conditional probabilities using LOCAL pivots calculated from FIRST HOUR
 **Advantage over standard pivots:** Reflects current day's intraday dynamics rather than previous day context.
 **Use:** If backtesting confirms superiority, use first hour (9:00-10:00) to establish local levels, then trade 10:00-17:30 based on local pivot conditional probabilities.
 **Status:** Potentially promising, requires backtesting vs standard pivot approach to determine which is superior.
+
+### 14. CHAR_DE40_Local_Pivot_Conditional_By_Regime.ipynb
+**Finding:** Positive delta scenarios identified in regime-specific conditions - to be backtested
+Extends local pivot conditional probabilities by splitting results across volatility regimes (Q1 Quiet, Q2, Q3, Q4 Spicy).
+**Method:**
+- Uses LOCAL pivots from first hour (9:00-10:00) like research #13
+- Calculates Early_TR (True Range sum across first hour) as volatility metric
+- Dynamic quartile assignment: Trim top/bottom 5% outliers, then rolling 60-day percentile rank
+- Regime classification: Q1 (0-25th percentile), Q2 (25-50th), Q3 (50-75th), Q4 (75-100th)
+- Calculate P(Target | Condition, Zone, Regime) for each quartile separately
+- Compare Q1 vs Q4 deltas to identify regime-specific edges
+**Hypothesis:** Certain local pivot conditional patterns may be stronger in quiet markets (mean reversion) or spicy markets (momentum continuation).
+**Key Innovation:** Adaptive regime thresholds based on rolling percentiles rather than fixed values - accounts for changing market conditions over time.
+**Use:** Identify which zone-condition-target combinations show large Q1-Q4 deltas (>15-20%) for regime-conditional trading rules.
+**Status:** Positive delta scenarios spotted in specific regime-zone-condition combinations, requires backtesting to validate edge persistence.
 
 
 
@@ -207,6 +222,7 @@ Measures conditional probabilities using LOCAL pivots calculated from FIRST HOUR
 | 11 | Fractional pivot targets by zone? | See research 12 (conditional) | Pending - superseded
 | 12 | Conditional probabilities after level hit (standard)? | Promising scenarios found | To backtest
 | 13 | Conditional probabilities - LOCAL pivots (first hour)? | Promising - potentially superior to standard | To backtest vs standard
+| 14 | LOCAL pivot conditionals BY REGIME (Q1-Q4)? | Positive delta scenarios in specific regime-zone-condition combos | To backtest
 
 **Bottom line:** Focus on intraday patterns (first hour, quiet regime). Ignore day-to-day direction betting. Test pivot levels and HL-based classification to confirm or improve existing edge.
 
@@ -223,5 +239,5 @@ Docs:
 
 ---
 
-**Last Updated:** 2024-12-14
-**Version:** 2.1 (added pivot point excursion and conditional probability studies)
+**Last Updated:** 2024-12-18
+**Version:** 2.2 (added local pivot conditional probabilities with regime-specific analysis)
