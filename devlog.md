@@ -62,3 +62,6 @@ That's one of the two stdies I'm planning to do on DAX, and sooner or later I wi
 
 18.12 (Day 15)
 - Extended local pivots research with Volatility regimes and as I silently expected there seem to be some positive delta scenarios - to be tested, but he results are possibly promising to build more specific scenarios
+
+29.12 (Day 16)
+- I prepared a very extensive prompt to test the local pivot strategy using Pinescript - however with my current approach it doesn't work and since it's already late I will return to the task later - either with Pinescript when I figure out what's wrong, or I'll pivot to CTrader
