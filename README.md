@@ -1,6 +1,6 @@
-# q-trading: Quantitative Trading Hub
+# q-trading: Quantitative Research Lab
 
-A production-ready Python framework for quantitative trading research and backtesting. Clean architecture, reproducible analysis, zero tolerance for bullshit.
+A Python framework for quantitative trading research. Currently focused on hypothesis generation and statistical validation using clean data pipelines. Backtesting is conducted externally (cTrader/Pinescript).
 
 ---
 
@@ -77,29 +77,21 @@ print(df_clean.index.tz)  # Europe/London
 ├── shared/
 │   ├── config.py                  # Configuration, symbols, timezones
 │   ├── database_connector.py      # PostgreSQL operations
-│   ├── data_module.py             # Data processing (validate, clean, impute)
-│   ├── engine.py                  # Backtester (TBD)
-│   └── reporting.py               # Metrics & reporting (TBD)
+│   └── data_module.py             # Data processing (validate, clean, impute)
 ├── quant_lab/
-│   └── notebooks/                 # Research Jupyter notebooks
-│       ├── CHAR_DE40_Trend_And_Range.ipynb
-│       ├── PHENOM_EURUSD_IB_Stats.ipynb
-│       └── ANALYSIS_LINEAR_REGRESSION.ipynb
-├── vector_bt/ - TBD
-│   ├── strategies/                # Strategy implementations
-│   ├── main.py                    # Strategy runner
-│   └── sweep.py                   # Parameter optimization
-├── docs/
-│   ├── DATA_PIPELINE.md           # Architecture & API reference
-│   ├── DATA_CLEANING.md           # Data cleaning procedures
-│   └── TIMEZONE.md                # Timezone handling details
+│   └── notebooks/                 # Research Jupyter notebooks (14 completed)
+│       ├── CHAR_DE40_*.ipynb      # DAX characteristics & patterns
+│       └── research_index.md      # Research summary & findings
 ├── tests/
 │   └── test_*.py                  # Unit tests
 ├── certs/
 │   └── ca-certificate.crt         # PostgreSQL SSL certificate
+├── devlog.md                      # Development log & ideas
 ├── requirements.txt               # Python dependencies
 └── README.md                      # This file
 ```
+
+**Note:** Backtesting modules (engine, strategies, optimization) will be added later. Current focus is research and validation.
 
 ---
 
@@ -163,10 +155,10 @@ process_data(df, symbol, timeframe, local_time=False, exclude_news=False)
 
 **Processing Steps:**
 1. Timezone localization (UTC)
-2. OHLC consistency validation
-3. Gap & outlier diagnostics
-4. MICE imputation (if missing data exists)
-5. Timezone conversion (if `local_time=True`)
+2. Timezone conversion to market local time
+3. Market hours filtering (RTH only)
+4. OHLC consistency validation
+5. Gap & outlier diagnostics
 6. News calendar filtering (if `exclude_news=True`)
 
 ---
@@ -212,33 +204,35 @@ CREATE TABLE symbol_metadata (
 
 ---
 
-## **Development Sprints**
+## **Current Development Stage**
 
-### **Sprint 1: Data Pipeline** ✓ COMPLETE
+### **Phase 1: Data Pipeline** ✓ COMPLETE
 - PostgreSQL connection with SSL/TLS
 - Raw OHLCV data fetching
+- Timezone handling (UTC → Market local time)
+- Market hours filtering (RTH only)
 - Data validation & diagnostics
-- MICE imputation for missing data
-- Timezone handling (UTC ↔ Local)
 - News calendar filtering
 - Comprehensive logging
 
-### **Sprint 2: Research** (WE ARE HERE AND NOT MOVING FURTHER YET - I'M IN THE RESEARCH LOOP RN)
-- quant-lab environment setup
-- DE40 characteristics analysis
-- EURUSD Initial Balance breakout study
-- Linear regression analysis
+### **Phase 2: Research** ✓ ONGOING (Current Focus)
+- **14 research notebooks completed** analyzing DAX intraday patterns
+- Key findings: 65% continuation edge (Quiet regime + Strong UP first hour)
+- Pivot point conditional probability studies (standard & local)
+- Regime-specific pattern analysis
+- **See:** [quant_lab/notebooks/research_index.md](quant_lab/notebooks/research_index.md) for full research summary
 
-### **Sprint 3: Backtester** (Planned)
-- Vectorized backtesting engine
-- Position sizing (Fixed Fractional, Kelly Criterion)
-- Performance metrics & reporting
-- First strategy implementation
+### **Phase 3: Backtesting** (Future)
+Currently backtesting hypotheses externally using:
+- **cTrader** (live/demo execution)
+- **Pinescript** (TradingView validation)
 
-### **Sprint 4: Optimization** (Planned)
-- Portfolio simulation
-- Parameter optimization
-- Walk-Forward analysis
+Python backtesting modules (vectorized engine, position sizing, optimization) will be added later if needed.
+
+### **Workflow**
+1. **Research (Python)**: Hypothesis generation, statistical validation, pattern discovery
+2. **Backtest (External)**: Strategy validation in cTrader/Pinescript
+3. **Live Trading (External)**: Execution on validated strategies
 
 ---
 
@@ -252,15 +246,9 @@ DATABASE_CA_CERT_PATH=./certs/ca-certificate.crt
 LOG_LEVEL=INFO
 ```
 
-### **Data Cleaning Settings** (`config.py`)
+### **Data Quality Settings** (`config.py`)
 
 ```python
-# MICE Imputation
-MICE_CONFIG = {
-    'max_iter': 10,           # Convergence iterations
-    'random_state': 42,       # Reproducible
-}
-
 # Outlier Detection Thresholds
 OUTLIER_THRESHOLD_MAD = 3.0   # Median Absolute Deviation
 OUTLIER_THRESHOLD_IQR = 1.5   # Interquartile Range
@@ -268,6 +256,8 @@ OUTLIER_THRESHOLD_IQR = 1.5   # Interquartile Range
 # Data Quality
 GAP_TOLERANCE_PERCENT = 30.0  # Warn if > 30% missing
 ```
+
+**Note:** MICE imputation is implemented but rarely used - DAX data is clean with no missing values.
 
 ---
 
@@ -396,17 +386,23 @@ Look for:
 
 ---
 
-## **Contributing**
+## **Key Research Findings**
 
-When adding features:
+From 14 completed DAX research notebooks (Jan 2023 - Sept 2025, M5 data):
 
-1. Follow the code structure (separate concerns)
-2. Add type hints and docstrings
-3. Include logging statements
-4. Write tests
-5. Update `docs/` files
-6. Update relevant `CHECKLIST.md` entries
+**What Works:**
+- ✓ **Intraday momentum in quiet regimes** (65% continuation, first hour → rest of day)
+- ✓ **Early volatility predicts daily regime** (R²=0.53, used for position sizing)
+- ✓ **Pivot point conditional probabilities** (promising scenarios identified, to be backtested)
+- ✓ **Local pivot points** (first hour H/L/C, potentially superior to standard pivots)
+
+**What Doesn't Work:**
+- ❌ Day-to-day direction prediction (50/50)
+- ❌ Volatility regime changes affecting direction
+- ❌ Yesterday's return predicting today
+
+**Full details:** [quant_lab/notebooks/research_index.md](quant_lab/notebooks/research_index.md)
 
 ---
 
-**Status:** Sprint 1 Complete ✓ | Ready for Sprint 2
+**Status:** Phase 1 Complete ✓ | Phase 2 Ongoing (Research Loop)
