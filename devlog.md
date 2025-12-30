@@ -65,4 +65,6 @@ That's one of the two stdies I'm planning to do on DAX, and sooner or later I wi
 
 29.12 (Day 16)
 - I prepared a very extensive prompt to test the local pivot strategy using Pinescript - however with my current approach it doesn't work and since it's already late I will return to the task later - either with Pinescript when I figure out what's wrong, or I'll pivot to CTrader
-- I've got to attempt tracking checks - current candle and LPPs visualizations for a given day, current price etc.
+
+30.12 (Day 17)
+- unrelated to the research/trading activities - I've prepared a major cleanup of unnecessary .md files and folders - some of them were outdated, some are simply unnecessary at this stage + I'm not sure whether I need an actual backtesting engine here YET. That's why I decided to update the current structure of the project, docs and README to reflect the current stage and stay in the reearch loop for now, as it's very enlightening.
