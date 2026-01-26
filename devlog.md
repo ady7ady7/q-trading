@@ -68,3 +68,9 @@ That's one of the two stdies I'm planning to do on DAX, and sooner or later I wi
 
 30.12 (Day 17)
 - unrelated to the research/trading activities - I've prepared a major cleanup of unnecessary .md files and folders - some of them were outdated, some are simply unnecessary at this stage + I'm not sure whether I need an actual backtesting engine here YET. That's why I decided to update the current structure of the project, docs and README to reflect the current stage and stay in the reearch loop for now, as it's very enlightening.
+
+14.01.26 (Day 18)
+- The next idea is to include moving to Databento m1 OHLCVs and check for b/p/D + VP-based setups on DAX + one US index + maybe crypto. But before there's still our LPPs setup to test with CT or whatever! I could even backtest it live
+
+26.01.26 (Day 19)
+- I was really busy during the past few weeks, but I've finally downloaded EOBI data from Databento - I will be working on it throughout the next days and looking for different phenomena.
