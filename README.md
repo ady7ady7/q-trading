@@ -1,6 +1,6 @@
 # q-trading: Quantitative Research Lab
 
-A Python framework for quantitative trading research. Currently focused on hypothesis generation and statistical validation using clean data pipelines. Backtesting is conducted externally (cTrader/Pinescript).
+A Python framework for quantitative trading research. Currently focused on hypothesis generation and statistical validation using clean data pipelines. Backtesting is conducted externally within my OOP backtesting engine that I've been working on during Q1 2026 - it's ready and can easily handle multiple strategies at once - check q_trading_backtester repo :)).
 
 ---
 
