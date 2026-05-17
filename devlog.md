@@ -74,3 +74,21 @@ That's one of the two stdies I'm planning to do on DAX, and sooner or later I wi
 
 26.01.26 (Day 19)
 - I was really busy during the past few weeks, but I've finally downloaded EOBI data from Databento - I will be working on it throughout the next days and looking for different phenomena.
+
+4.02.26 (Day 20)
+- Idea to check - IB size (relative) vs rest of the day relative move size
+- Idea to check - IB size + position relative to pdVA (conditional scenarios)
+- Idea to check - IDA-R / OA-R
+
+25.02.26 (Day 21)
+- Backtests throughout this month on TV with data analyzed here.
+- TBD: Integration of the backtesting module created as a part of my PCAP learning experience (expected within 2 weeks time)
+- The goal is to create a backtesting engine that allows to test multiple strategies at once with R result for every trade. We will have the results grouped by their strategies as well as together, so we can run multiple Monte Carlo simulations and mix up the results to see how they perform in other orders of randomness (checking for MAX DD and general tendencies)
+
+16.03.26 (Day 22)
+- TBD: Tests of IB vs rest-of-the-day volatility
+
+17.05.26 (Day 23)
+- After a very long break, but I WAS NOT SLACKING OFF. I've built a fully OOP backtesting engine that's ready to test multiple strategies at once and also I can easily implement Monte Carlo simulations and portfolio simulations there. Now it's time to go to researching market data, as I've just downloaded almost 7GB of NQ E-mini Futures data from the last 8-9 months.
+
+- Implemented changes in this repo with Claude - added and integrated NQ data - it's in data/ folder, so you will not be able to see it for OBVIOUS REASONS.

@@ -1,4 +1,15 @@
-# DAX Research Index
+# Research Index
+
+## Instruments
+
+| Instrument | Data Source | Timezone | RTH | Data Type |
+|---|---|---|---|---|
+| DAX (DE40/FDAX) | PostgreSQL DB (M5 OHLCV) | Europe/Berlin | 09:00-17:30 | OHLCV bars |
+| NQ (Nasdaq futures) | `data/` local CSVs/parquets (Databento EOBI) | America/New_York | 09:30-16:00 | Tick trades, M1/M5 bars, Volume Profile (POC/VAL/VAH), Value Area |
+
+---
+
+## DAX Research
 
 **Period:** Jan 2023 - Sept 2025 (M5 data, 09:00-17:30 Berlin time)
 **Status:** 14 research notebooks, key edges identified, many dead ends ruled out
@@ -239,5 +250,28 @@ Docs:
 
 ---
 
-**Last Updated:** 2024-12-18
-**Version:** 2.2 (added local pivot conditional probabilities with regime-specific analysis)
+---
+
+## NQ Research
+
+**Period:** Sep 2025 – May 2026 (~159 RTH sessions, Databento EOBI tick data)
+**Status:** Starting phase — carrying over proven FDAX research patterns + new VP/tick-based research
+
+**Available data:**
+- M1 / M5 OHLCV bars (incl. vwap_rth, vwap_full)
+- Per-session Value Area: POC, VAL, VAH, session H/L, VWAP
+- Per-price-level Volume Profile: bid/ask split per session
+- Raw tick trades (56M rows): price, size, side, nanosecond timestamps
+
+**Planned research:**
+- Repeat key FDAX studies (volatility regimes, first-hour move → rest-of-day, pivot conditionals)
+- IB size vs rest-of-day volatility
+- IB size + position relative to pdVA (previous day Value Area)
+- IDA-R / OA-R analysis
+- VP-based: POC/VAL/VAH reaction probabilities
+- Order flow / tick imbalance studies
+
+---
+
+**Last Updated:** 2026-05-17
+**Version:** 3.0 (added NQ instrument, Databento EOBI data)

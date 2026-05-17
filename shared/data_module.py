@@ -9,6 +9,7 @@ This module handles:
   - News calendar filtering
 
 Raw data fetching is handled by database_connector.py.
+Local CSV files can be loaded via load_from_csv().
 """
 
 import logging
@@ -31,6 +32,7 @@ from shared.config import (
     LOG_LEVEL,
     LOGS_DIR,
     MARKET_HOLIDAYS,
+    PROJECT_ROOT,
     get_symbol_info,
 )
 
@@ -130,6 +132,96 @@ def process_data(
         f"[OK] Data processing complete: {len(df)} candles, "
         f"range {df.index.min()} to {df.index.max()}"
     )
+    return df
+
+
+# ============================================================================
+# LOCAL FILE LOADING
+# ============================================================================
+def load_from_csv(
+    filepath: str,
+    timestamp_col: str = None,
+    timezone: str = None,
+) -> pd.DataFrame:
+    """
+    Load OHLCV data from a local CSV file.
+
+    Alternative to the database pipeline (fetch_ohlcv + process_data).
+    Returns a DataFrame with timezone-aware DatetimeIndex, ready for
+    research notebooks.
+
+    Handles mixed UTC offsets (e.g. +01:00 CET and +02:00 CEST in the
+    same file) by parsing through UTC first, then converting to target tz.
+
+    Args:
+        filepath: Path to CSV file. Absolute paths used directly.
+                  Relative paths resolved from project root.
+        timestamp_col: Column to use as timestamp index.
+                       Auto-detects if None (looks for 'candle_open',
+                       'timestamp', 'datetime', 'date').
+        timezone: Target timezone for output (e.g. 'Europe/Berlin').
+                  If None and data has tz info, keeps as UTC.
+                  If None and data is tz-naive, assumes UTC.
+
+    Returns:
+        pd.DataFrame: Timezone-aware DatetimeIndex, OHLCV + any extra columns.
+
+    Examples:
+        df = load_from_csv('shared/FDAX_M5_OHLCV.csv', timezone='Europe/Berlin')
+        df = load_from_csv('C:/data/my_file.csv', timestamp_col='time')
+    """
+    filepath = Path(filepath)
+    if not filepath.is_absolute():
+        filepath = PROJECT_ROOT / filepath
+
+    if not filepath.exists():
+        raise FileNotFoundError(f"Data file not found: {filepath}")
+
+    logger.info(f"Loading data from CSV: {filepath.name}")
+
+    df = pd.read_csv(filepath)
+
+    # Auto-detect timestamp column
+    if timestamp_col is None:
+        candidates = ['candle_open', 'timestamp', 'datetime', 'date', 'time']
+        for c in candidates:
+            if c in df.columns:
+                timestamp_col = c
+                break
+        if timestamp_col is None:
+            raise ValueError(
+                f"Cannot auto-detect timestamp column from: {list(df.columns)}. "
+                f"Pass timestamp_col explicitly."
+            )
+
+    logger.info(f"Using timestamp column: '{timestamp_col}'")
+
+    # Parse timestamps - utc=True handles mixed offsets (CET/CEST etc.)
+    df[timestamp_col] = pd.to_datetime(df[timestamp_col], utc=True)
+    df = df.set_index(timestamp_col)
+    df.index.name = None
+
+    # Convert to target timezone if specified
+    if timezone:
+        df.index = df.index.tz_convert(timezone)
+        logger.info(f"Converted to timezone: {timezone}")
+
+    # Standardize column names to lowercase
+    df.columns = df.columns.str.lower()
+
+    # Validate OHLC columns exist
+    required = ['open', 'high', 'low', 'close']
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
+
+    df = df.sort_index()
+
+    logger.info(
+        f"[OK] Loaded {len(df)} candles from {filepath.name}, "
+        f"range {df.index.min()} to {df.index.max()}"
+    )
+
     return df
 
 
