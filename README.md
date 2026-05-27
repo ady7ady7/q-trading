@@ -38,8 +38,8 @@ Statistical research on futures and equity index markets. Hypothesis generation 
 
 | Instrument | Data Source | Timezone | RTH |
 |---|---|---|---|
-| DAX (DE40/FDAX) | PostgreSQL (M5 OHLCV) | Europe/Berlin | 09:00–17:30 |
-| NQ (Nasdaq futures) | `data/` local files (Databento EOBI) | America/New_York | 09:30–16:00 |
+| DAX (DE40/FDAX) | PostgreSQL (M5 OHLCV) / Databento EOBI tick data | Europe/Berlin | 09:00–17:30 |
+| NQ (Nasdaq futures) | `data/` local files (Databento EOBI tick data) | America/New_York | 09:30–16:00 |
 
 ---
 
